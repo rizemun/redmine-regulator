@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Oggetto Redmine regul'ator
 // @namespace     rizemun.oggetto
-// @version       0.2
+// @version       0.2.1
 // @downloadURL   https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @updateURL     https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @description   Add time-tracking assistant
