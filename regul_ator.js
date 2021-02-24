@@ -2,8 +2,8 @@
 // @name          Oggetto Redmine regul'ator
 // @namespace     rizemun.oggetto
 // @version       0.1
-// @downloadURL   https://raw.githubusercontent.com/rizemun/redmine-regulator/master/regul_ator.js
-// @updateURL     https://raw.githubusercontent.com/rizemun/redmine-regulator/master/regul_ator.js
+// @downloadURL   https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.js
+// @updateURL     https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.js
 // @description   Add time-tracking assistant
 // @author        Artem Markin <rizeman01@gmail.com>
 // @match         https://redmine.oggettoweb.com/issues/*/time_entries/*
