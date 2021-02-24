@@ -35,12 +35,6 @@
     114: 'Support'
   };
 
-  const TIME_TYPE = {
-    'REGULAR': 'Regular',
-    'FUCKUP': 'Fuc%up',
-    'TEAM_FUCKUP': 'Team Fuc%up'
-  };
-
   const ESTIMATES = {
     'Backend development': 18,
     'Frontend development': 19,
@@ -55,6 +49,12 @@
     'SETTINGS': 25,
     'MD': 29
   }
+
+  const TIME_TYPE = {
+    'REGULAR': 'Regular',
+    'FUCKUP': 'Fuc%up',
+    'TEAM_FUCKUP': 'Team Fuc%up'
+  };
 
   const siteUrl = 'https://redmine.oggettoweb.com/'
   const issueNumber = document.getElementById('time_entry_issue_id').value;
