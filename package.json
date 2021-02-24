@@ -1,14 +1,14 @@
 {
   "name": "regulator",
   "version": "0.0.1",
-  "description": "regulates trach of time in redmine",
+  "description": "regulates track of time in redmine",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rizemun/redmine-regulator.git"
+    "url": "https://github.com/rizemun/redmine-regulator.git"
   },
   "keywords": [
     "js",
