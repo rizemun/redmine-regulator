@@ -144,9 +144,6 @@
       let isDuties = !!customFields.filter(custField => custField.id === 12 && custField.value === TIME_TYPE.TEAM_FUCKUP).length;
       let isFuckup = !!customFields.filter(custField => custField.id === 12 && custField.value === TIME_TYPE.FUCKUP).length;
 
-
-
-
       if(isDuties) {
         acc += elem.hours
       }
