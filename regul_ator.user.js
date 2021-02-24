@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Oggetto Redmine regul'ator
 // @namespace     rizemun.oggetto
-// @version       0.1
+// @version       0.2
 // @downloadURL   https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @updateURL     https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @description   Add time-tracking assistant
@@ -58,10 +58,6 @@
 
   const siteUrl = 'https://redmine.oggettoweb.com/'
   const issueNumber = document.getElementById('time_entry_issue_id').value;
-
-
-
-
 
   getData(issueNumber).then((data) => {
     init(data);
@@ -144,9 +140,9 @@
 
       let customFields = elem.custom_fields;
 
-      let isRegular = !!customFields.filter(custField => custField.id == 12 && custField.value == 'Regular').length;
-      let isDuties = !!customFields.filter(custField => custField.id == 12 && custField.value == 'Regular').length;
-      let isFuckup = !!customFields.filter(custField => custField.id == 12 && custField.value == 'Regular').length;
+      let isRegular = !!customFields.filter(custField => custField.id === 12 && custField.value === TIME_TYPE.REGULAR).length;
+      let isDuties = !!customFields.filter(custField => custField.id === 12 && custField.value === TIME_TYPE.TEAM_FUCKUP).length;
+      let isFuckup = !!customFields.filter(custField => custField.id === 12 && custField.value === TIME_TYPE.FUCKUP).length;
 
 
 
