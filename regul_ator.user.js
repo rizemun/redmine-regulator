@@ -10,7 +10,7 @@
 // @grant         none
 // ==/UserScript==
 
-(function() {
+(function () {
   'use strict';
 
   class RedmineApiKey {
@@ -38,10 +38,10 @@
       const data = await response.text();
       const parcedData = data.match(/html[(]'(\w*?)'[)]/)
       const apiKey = (parcedData && parcedData[1])
-          ? parcedData[1]
-          : '';
+        ? parcedData[1]
+        : '';
 
-      if(!apiKey) {
+      if (!apiKey) {
         console.error('api key not found')
       }
 
@@ -55,15 +55,15 @@
     }
   }
 
-  settings = async () => {
+  const settings = async () => {
+    const redmineApiKey = new RedmineApiKey();
     return {
-      apiKey: new RedmineApiKey().localKey ? new RedmineApiKey().localKey : await new RedmineApiKey().loadApiKey()
+      siteUrl: 'https://redmine.oggettoweb.com/',
+      apiKey: redmineApiKey.localKey ? redmineApiKey.localKey : await redmineApiKey.loadApiKey()
     }
   };
 
   settings().then(settings => console.log(settings))
-
-
 
 
   const ACTIVITIES = {
@@ -89,7 +89,7 @@
     'Frontend development': 19,
     'Testing': 20,
     'Project management': 26,
-    'Design':17,
+    'Design': 17,
 
     'ADMIN': 24,
     'REVIEW': 37,
@@ -105,13 +105,12 @@
     'TEAM_FUCKUP': 'Team Fuc%up'
   };
 
-  const siteUrl = 'https://redmine.oggettoweb.com/'
   const issueNumber = document.getElementById('time_entry_issue_id').value;
 
   getData(issueNumber).then((data) => {
     init(data);
 
-    getTimeEntities(data.project.id, issueNumber).then((timeData)=> {
+    getTimeEntities(data.project.id, issueNumber).then((timeData) => {
       //console.log('timeData')
       //console.log(timeData)
       renderSpentTime(calcTrackedTime(timeData.time_entries))
@@ -122,12 +121,28 @@
   class estimator {
     constructor() {
       this.cache();
+      this.events();
+
+      const issueNumber = document.getElementById('time_entry_issue_id').value;
+
+      this.getIssueData(issueNumber).then((data) => {
+        init(data);
+
+        /*getTimeEntities(data.project.id, issueNumber).then((timeData) => {
+          //console.log('timeData')
+          //console.log(timeData)
+          renderSpentTime(calcTrackedTime(timeData.time_entries))
+        })*/
+
+      })
+
     }
 
     cache() {
       this.settings = {
         selectors: {
-          hoursInput: '#time_entry_hours'
+          hoursInput: '#time_entry_hours',
+          activityInput: '#time_entry_activity_id'
         },
         id: {
           estimateContent: 'estimate_block'
@@ -138,23 +153,39 @@
       }
 
       this.$hoursinput = $(this.settings.selectors.hoursInput)
+      this.$activityInput = $(this.settings.selectors.activityInput)
     }
 
-    events() {
+    events(data) {
+      this.$activityInput.on('change', this.onActivityInputChange.bind(this))
+    }
 
+    onActivityInputChange(ev) {
+      const value = ev.target.value;
+
+      if (!value) {
+        this.resetEstimate()
+        return
+      }
+      const estimate = this.getEstimateByActivityId(value, data.custom_fields)
+      if (!estimate) {
+        this.resetEstimate()
+        return
+      }
+      this.renderEstimate(` ${ACTIVITIES[value]}: ${estimate}ч`)
     }
 
     createEstimate(template) {
       const $estimateElem = $('<span>')
-          .attr('id', this.settings.id.estimateContent)
-          .data(this.settings.data.mainEstimate, template);
+        .attr('id', this.settings.id.estimateContent)
+        .data(this.settings.data.mainEstimate, template);
 
       this.$hoursinput.after($estimateElem);
       this.$esimateContent = $estimateElem;
     }
 
     renderEstimate(template) {
-      if(!this.$esimateContent) {
+      if (!this.$esimateContent) {
         return
       }
       this.$esimateContent.html(template)
@@ -177,17 +208,33 @@
     getEstimateById(id) {
       return issueData.customFields.find(elem => elem.id === id).value;
     }
+
+    /**
+     * get issue data via api using issue id
+     *
+     * @param id
+     * @returns {Promise<*>}
+     */
+    async getIssueData(id) {
+      let url = 'https://redmine.oggettoweb.com/issues.json?issue_id=' + id;
+      let res = await fetch(url, {
+        cache: 'no-cache',
+        headers: {
+          'X-Redmine-API-Key': await settings().apiKey
+        },
+      })
+      let jsonRes = await res.json();
+
+      this.issueData = jsonRes.issues[0];
+      return this.issueData
+    }
+
+
   }
-
-
-
 
 
   function init(data) {
     events(data);
-
-    createEstimate(`Base estimate: ${data.estimated_hours}ч`);
-    resetEstimate()
   }
 
   function events(data) {
@@ -207,29 +254,6 @@
     })
   }
 
-  function getEstimatesbyActivities(activityId, customFields) {
-    const activity = ACTIVITIES[activityId];
-    return getEstimate(ESTIMATES[activity], customFields)
-  }
-
-  function getEstimate(id, customFields) {
-    return customFields.find(elem => elem.id === id).value;
-  }
-
-  function createEstimate(template) {
-    const $estimateElem = $('<span>').attr('id','estimate_block').data('main-estimate', template);
-    $('#time_entry_hours').after($estimateElem);
-  }
-
-  function renderEstimate(template) {
-    $('#estimate_block').html(template)
-  }
-
-  function resetEstimate() {
-    let $estimate = $('#estimate_block');
-    renderEstimate($estimate.data('main-estimate'));
-  }
-
 
   function renderSpentTime(hours) {
     const estimateElem = document.createElement('span');
@@ -241,13 +265,13 @@
   function calcTrackedTime(timeEntries) {
     console.log(timeEntries)
     return timeEntries.reduce((acc, elem) => {
-      let checkType = function(customFields) {
-        let types = ['Regular','Fuck%p','Duties']
+      let checkType = function (customFields) {
+        let types = ['Regular', 'Fuck%p', 'Duties']
 
 
         types.reduce((acc, type) => {
           customFields.filter(custField => custField.id == 12 && custField.value == type)
-        },'')
+        }, '')
       }
 
       let customFields = elem.custom_fields;
@@ -256,26 +280,11 @@
       let isDuties = !!customFields.filter(custField => custField.id === 12 && custField.value === TIME_TYPE.TEAM_FUCKUP).length;
       let isFuckup = !!customFields.filter(custField => custField.id === 12 && custField.value === TIME_TYPE.FUCKUP).length;
 
-      if(isDuties) {
+      if (isDuties) {
         acc += elem.hours
       }
       return acc
-    },0)
-  }
-
-  async function getData(id) {
-    let url = 'https://redmine.oggettoweb.com/issues.json?issue_id='+id;
-    let res = await fetch(url, {
-      cache: 'no-cache',
-      headers: {
-        'X-Redmine-API-Key': await settings().apiKey
-      },
-
-    })
-
-    let jsonRes = await res.json();
-
-    return jsonRes.issues[0]
+    }, 0)
   }
 
   async function getTimeEntities(projectId, issueId) {
