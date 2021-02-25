@@ -13,9 +13,58 @@
 (function() {
   'use strict';
 
-  const settings = {
-    apiKey: '142d740244290eb296e296e2cb715d5c5439093c',
+  class RedmineApiKey {
+    constructor() {
+      this.settings = {
+        itemname: 'redmine-api-key'
+      };
+    }
+
+    get localKey() {
+      return localStorage.getItem(this.settings.itemname)
+    }
+
+    set localKey(key) {
+      localStorage.setItem(this.settings.itemname, key)
+    }
+
+    async loadApiKey() {
+      let response = await fetch('https://redmine.oggettoweb.com/my/api_key', {
+        headers: {
+          accept: 'text/javascript',
+          'x-requested-with': 'XMLHttpRequest'
+        }
+      })
+      const data = await response.text();
+      const parcedData = data.match(/html[(]'(\w*?)'[)]/)
+      const apiKey = (parcedData && parcedData[1])
+          ? parcedData[1]
+          : '';
+
+      if(!apiKey) {
+        console.error('api key not found')
+      }
+
+      this.localKey = apiKey;
+
+      return await apiKey;
+    }
+
+    removeKey() {
+      localStorage.removeItem(this.settings.itemname)
+    }
+  }
+
+  settings = async () => {
+    return {
+      apiKey: new RedmineApiKey().localKey ? new RedmineApiKey().localKey : await new RedmineApiKey().loadApiKey()
+    }
   };
+
+  settings().then(settings => console.log(settings))
+
+
+
 
   const ACTIVITIES = {
     8:  'Design',
@@ -70,11 +119,74 @@
 
   })
 
+  class estimator {
+    constructor() {
+      this.cache();
+    }
+
+    cache() {
+      this.settings = {
+        selectors: {
+          hoursInput: '#time_entry_hours'
+        },
+        id: {
+          estimateContent: 'estimate_block'
+        },
+        data: {
+          mainEstimate: 'main-estimate'
+        }
+      }
+
+      this.$hoursinput = $(this.settings.selectors.hoursInput)
+    }
+
+    events() {
+
+    }
+
+    createEstimate(template) {
+      const $estimateElem = $('<span>')
+          .attr('id', this.settings.id.estimateContent)
+          .data(this.settings.data.mainEstimate, template);
+
+      this.$hoursinput.after($estimateElem);
+      this.$esimateContent = $estimateElem;
+    }
+
+    renderEstimate(template) {
+      if(!this.$esimateContent) {
+        return
+      }
+      this.$esimateContent.html(template)
+    }
+
+    resetEstimate() {
+      this.renderEstimate(this.$esimateContent.data(this.settings.data.mainEstimate));
+    }
+
+    loadEstimates(data) {
+      //todo: реализовать метод
+      this.issueData = data;
+    }
+
+    getEstimateByActivityId(activityId) {
+      const activity = ACTIVITIES[activityId];
+      return this.getEstimate(ESTIMATES[activity])
+    }
+
+    getEstimateById(id) {
+      return issueData.customFields.find(elem => elem.id === id).value;
+    }
+  }
+
+
+
+
 
   function init(data) {
     events(data);
 
-    createEstimate(`Base setimate: ${data.estimated_hours}ч`);
+    createEstimate(`Base estimate: ${data.estimated_hours}ч`);
     resetEstimate()
   }
 
