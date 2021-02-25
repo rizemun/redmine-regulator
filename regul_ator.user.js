@@ -268,7 +268,7 @@
     let res = await fetch(url, {
       cache: 'no-cache',
       headers: {
-        'X-Redmine-API-Key': settings.apiKey
+        'X-Redmine-API-Key': await settings().apiKey
       },
 
     })
@@ -283,7 +283,7 @@
     let res = await fetch(url, {
       cache: 'no-cache',
       headers: {
-        'X-Redmine-API-Key': settings.apiKey
+        'X-Redmine-API-Key': await settings().apiKey
       },
 
     })
