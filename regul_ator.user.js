@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Oggetto Redmine regul'ator
 // @namespace     rizemun.oggetto
-// @version       0.2.1
+// @version       0.2.2
 // @downloadURL   https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @updateURL     https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @description   Add time-tracking assistant
@@ -15,7 +15,7 @@
 
   const settings = {
     apiKey: '142d740244290eb296e296e2cb715d5c5439093c',
-  }
+  };
 
   const ACTIVITIES = {
     8:  'Design',
@@ -74,8 +74,8 @@
   function init(data) {
     events(data);
 
-    createEstimate(` Эстимейт: ${data.estimated_hours}ч`);
-    renderEstimate(` Эстимейт: ${data.estimated_hours}ч`)
+    createEstimate(`Base setimate: ${data.estimated_hours}ч`);
+    resetEstimate()
   }
 
   function events(data) {
@@ -121,7 +121,7 @@
 
   function renderSpentTime(hours) {
     const estimateElem = document.createElement('span');
-    estimateElem.innerHTML = ` Трекнуто времени: ${hours}ч;`;
+    estimateElem.innerHTML = `Трекнуто времени: ${hours}ч; `;
     const timeInput = document.getElementById('time_entry_hours');
     timeInput.after(estimateElem);
   }
