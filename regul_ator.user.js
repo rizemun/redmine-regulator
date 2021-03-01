@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Oggetto Redmine regul'ator
 // @namespace     rizemun.oggetto
-// @version       0.2.4
+// @version       0.2.5
 // @downloadURL   https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @updateURL     https://github.com/rizemun/redmine-regulator/raw/master/regul_ator.user.js
 // @description   Add time-tracking assistant
@@ -216,11 +216,12 @@
      * @returns {Promise<*>}
      */
     async getIssueData(id) {
-      let url = 'https://redmine.oggettoweb.com/issues.json?issue_id=' + id;
-      let res = await fetch(url, {
+      const url = 'https://redmine.oggettoweb.com/issues.json?issue_id=' + id;
+      const settings = await settings()
+      const res = await fetch(url, {
         cache: 'no-cache',
         headers: {
-          'X-Redmine-API-Key': await settings().apiKey
+          'X-Redmine-API-Key': settings.apiKey
         },
       })
       let jsonRes = await res.json();
@@ -289,10 +290,11 @@
 
   async function getTimeEntities(projectId, issueId) {
     const url = `https://redmine.oggettoweb.com/time_entries.json?project_id=${projectId}&issue_id=${issueId}`;
+    const settings = await settings()
     let res = await fetch(url, {
       cache: 'no-cache',
       headers: {
-        'X-Redmine-API-Key': await settings().apiKey
+        'X-Redmine-API-Key': settings.apiKey
       },
 
     })
